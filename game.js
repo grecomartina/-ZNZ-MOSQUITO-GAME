@@ -1,93 +1,64 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-const scoreElement = document.getElementById('score');
+const scoreDisplay = document.getElementById('score');
 
 let score = 0;
 let gameActive = true;
+const mosquito = { x: 50, y: 250, w: 30, h: 30, grav: 0.6, vel: 0, jump: -8 };
+const pipes = [];
+const pipeWidth = 50;
+const gap = 150;
 
-const mosquito = {
-    x: 50,
-    y: 300,
-    width: 30,
-    height: 30,
-    gravity: 0.6,
-    velocity: 0,
-    jump: -9
-};
-
-const obstacles = [];
-const obstacleWidth = 50;
-const obstacleGap = 160;
-
-function createObstacle() {
-    const minHeight = 50;
-    const maxHeight = canvas.height - obstacleGap - minHeight;
-    const height = Math.random() * (maxHeight - minHeight) + minHeight;
-    obstacles.push({
-        x: canvas.width,
-        top: height,
-        bottom: canvas.height - height - obstacleGap,
-        passed: false
-    });
-}
-
-function gameOver() {
-    gameActive = false;
-    alert("GIOCO FINITO!\nPunteggio: " + score + "\n\nEntra nel gruppo per non perdere il lancio!");
-    // Reset automatico
-    score = 0;
-    scoreElement.innerText = score;
-    mosquito.y = 300;
-    mosquito.velocity = 0;
-    obstacles.length = 0;
+function reset() {
+    score = 0; 
+    scoreDisplay.innerText = score;
+    mosquito.y = 250; 
+    mosquito.vel = 0;
+    pipes.length = 0; 
     gameActive = true;
-    requestAnimationFrame(update);
 }
 
 function update() {
     if (!gameActive) return;
 
-    // Gravità e movimento zanzara
-    mosquito.velocity += mosquito.gravity;
-    mosquito.y += mosquito.velocity;
+    // Gravità e movimento
+    mosquito.vel += mosquito.grav;
+    mosquito.y += mosquito.vel;
 
-    // COLLISIONE TERRA O SOFFITTO
-    if (mosquito.y + mosquito.height >= canvas.height || mosquito.y <= 0) {
-        gameOver();
-        return;
+    // COLLISIONE TERRA O SOFFITTO (Risolto bug)
+    if (mosquito.y + mosquito.h > canvas.height || mosquito.y < 0) {
+        alert("HAI PERSO! Punteggio: " + score);
+        reset();
     }
 
     // Generazione ostacoli
-    if (obstacles.length === 0 || obstacles[obstacles.length - 1].x < canvas.width - 250) {
-        createObstacle();
+    if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 200) {
+        const h = Math.random() * (canvas.height - gap - 100) + 50;
+        pipes.push({ x: canvas.width, top: h, passed: false });
     }
 
-    // Movimento e collisione ostacoli
-    for (let i = obstacles.length - 1; i >= 0; i--) {
-        obstacles[i].x -= 3;
-
-        // Collisione con tubi
-        if (
-            mosquito.x < obstacles[i].x + obstacleWidth &&
-            mosquito.x + mosquito.width > obstacles[i].x &&
-            (mosquito.y < obstacles[i].top || mosquito.y + mosquito.height > canvas.height - obstacles[i].bottom)
-        ) {
-            gameOver();
-            return;
+    // Movimento e collisione tubi
+    for (let i = pipes.length - 1; i >= 0; i--) {
+        pipes[i].x -= 3;
+        
+        // Controllo collisione con i tubi
+        if (mosquito.x < pipes[i].x + pipeWidth && 
+            mosquito.x + mosquito.w > pipes[i].x &&
+            (mosquito.y < pipes[i].top || mosquito.y + mosquito.h > pipes[i].top + gap)) {
+            alert("COLLISIONE! Punteggio: " + score);
+            reset();
         }
 
         // Punteggio
-        if (!obstacles[i].passed && obstacles[i].x < mosquito.x) {
-            score++;
-            scoreElement.innerText = score;
-            obstacles[i].passed = true;
+        if (!pipes[i].passed && pipes[i].x < mosquito.x) {
+            score++; 
+            scoreDisplay.innerText = score;
+            pipes[i].passed = true;
         }
 
-        if (obstacles[i].x + obstacleWidth < 0) {
-            obstacles.splice(i, 1);
-        }
+        // Rimuovi tubi vecchi
+        if (pipes[i].x + pipeWidth < 0) pipes.splice(i, 1);
     }
-
     draw();
     requestAnimationFrame(update);
 }
@@ -95,30 +66,23 @@ function update() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Sfondo
-    ctx.fillStyle = '#111';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Zanzara
+    // Disegna Zanzara (Gialla)
     ctx.fillStyle = '#f3ba2f';
-    ctx.fillRect(mosquito.x, mosquito.y, mosquito.width, mosquito.height);
+    ctx.fillRect(mosquito.x, mosquito.y, mosquito.w, mosquito.h);
 
-    // Ostacoli
-    ctx.fillStyle = '#555';
-    obstacles.forEach(opt => {
-        ctx.fillRect(opt.x, 0, obstacleWidth, opt.top);
-        ctx.fillRect(opt.x, canvas.height - opt.bottom, obstacleWidth, opt.bottom);
+    // Disegna Ostacoli (Grigi)
+    ctx.fillStyle = '#444';
+    pipes.forEach(p => {
+        ctx.fillRect(p.x, 0, pipeWidth, p.top);
+        ctx.fillRect(p.x, p.top + gap, pipeWidth, canvas.height);
     });
 }
 
-// Comandi per PC e Telefono
-window.addEventListener('keydown', (e) => {
-    mosquito.velocity = mosquito.jump;
-});
-
-canvas.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    mosquito.velocity = mosquito.jump;
-}, { passive: false });
+// Comandi
+window.addEventListener('keydown', () => mosquito.vel = mosquito.jump);
+canvas.addEventListener('touchstart', (e) => { 
+    e.preventDefault(); 
+    mosquito.vel = mosquito.jump; 
+}, {passive: false});
 
 update();
