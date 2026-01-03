@@ -2,20 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ZNZ INFINITE</title>
     <style>
-        body { margin: 0; background: #000; color: #f3ba2f; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        canvas { border: 3px solid #f3ba2f; background: #111; box-shadow: 0 0 20px rgba(243, 186, 47, 0.2); }
-        h1 { margin: 5px; font-size: 22px; text-transform: uppercase; }
-        #score { font-size: 30px; font-weight: bold; margin-bottom: 10px; }
+        body { background: #000; color: #f3ba2f; text-align: center; font-family: sans-serif; }
+        canvas { border: 2px solid #f3ba2f; background: #111; margin-top: 20px; }
     </style>
 </head>
 <body>
     <h1>ZNZ INFINITE</h1>
-    <div id="score">0</div>
-    <canvas id="gameCanvas" width="360" height="500"></canvas>
-
+    <p>Score: <span id="score">0</span></p>
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
     <script src="game.js"></script>
 </body>
 </html>
