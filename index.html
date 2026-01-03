@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZNZ INFINITE - MOBILE ONLY</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.min.js"></script>
+    <title>ZNZ - Gioco della Zanzara</title>
     <style>
-        body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; touch-action: none; }
-        #game-container { border: 2px solid #fff; }
+        body { margin: 0; padding: 0; background-color: #000; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        canvas { border: 2px solid #f3ba2f; background: #111; max-width: 90vw; max-height: 70vh; }
+        h1 { margin: 10px 0; font-size: 24px; color: #f3ba2f; }
+        p { margin: 5px 0; font-size: 20px; }
     </style>
 </head>
 <body>
-    <div id="game-container"></div>
-    <script src="game.js"></script>
+    <h1>ZNZ INFINITE</h1>
+    <p>Punteggio: <span id="score">0</span></p>
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+    
+    <script src="script.js"></script>
 </body>
 </html>
