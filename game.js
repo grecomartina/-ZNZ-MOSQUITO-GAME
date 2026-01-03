@@ -21,42 +21,36 @@ function reset() {
 function update() {
     if (!gameActive) return;
 
-    // Gravità e movimento
     mosquito.vel += mosquito.grav;
     mosquito.y += mosquito.vel;
 
-    // COLLISIONE TERRA O SOFFITTO (Risolto bug)
+    // Boundary collision
     if (mosquito.y + mosquito.h > canvas.height || mosquito.y < 0) {
-        alert("HAI PERSO! Punteggio: " + score);
+        alert("GAME OVER! Score: " + score);
         reset();
     }
 
-    // Generazione ostacoli
     if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 200) {
         const h = Math.random() * (canvas.height - gap - 100) + 50;
         pipes.push({ x: canvas.width, top: h, passed: false });
     }
 
-    // Movimento e collisione tubi
     for (let i = pipes.length - 1; i >= 0; i--) {
         pipes[i].x -= 3;
         
-        // Controllo collisione con i tubi
         if (mosquito.x < pipes[i].x + pipeWidth && 
             mosquito.x + mosquito.w > pipes[i].x &&
             (mosquito.y < pipes[i].top || mosquito.y + mosquito.h > pipes[i].top + gap)) {
-            alert("COLLISIONE! Punteggio: " + score);
+            alert("COLLISION! Score: " + score);
             reset();
         }
 
-        // Punteggio
         if (!pipes[i].passed && pipes[i].x < mosquito.x) {
             score++; 
             scoreDisplay.innerText = score;
             pipes[i].passed = true;
         }
 
-        // Rimuovi tubi vecchi
         if (pipes[i].x + pipeWidth < 0) pipes.splice(i, 1);
     }
     draw();
@@ -65,12 +59,8 @@ function update() {
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Disegna Zanzara (Gialla)
     ctx.fillStyle = '#f3ba2f';
     ctx.fillRect(mosquito.x, mosquito.y, mosquito.w, mosquito.h);
-
-    // Disegna Ostacoli (Grigi)
     ctx.fillStyle = '#444';
     pipes.forEach(p => {
         ctx.fillRect(p.x, 0, pipeWidth, p.top);
@@ -78,7 +68,6 @@ function draw() {
     });
 }
 
-// Comandi
 window.addEventListener('keydown', () => mosquito.vel = mosquito.jump);
 canvas.addEventListener('touchstart', (e) => { 
     e.preventDefault(); 
